@@ -1,0 +1,52 @@
+{
+  "users": {
+    "default": {
+      "streak": 3,
+      "lastCompletedDate": "2026-09-23",
+      "lastActiveDate": "2026-09-24",
+      "totalTasksFinished": 50,
+      "tasks": [
+        {
+          "id": "task-1",
+          "text": "Deep Work: 90-min core architectural focus block",
+          "category": "Deep Work",
+          "completed": true,
+          "recurring": true,
+          "completedAt": "2026-09-24T00:41:18.158Z"
+        },
+        {
+          "id": "task-2",
+          "text": "Review & assimilate 2 Innovation Feed breakthroughs",
+          "category": "Learning",
+          "completed": true,
+          "recurring": true,
+          "completedAt": "2026-09-24T00:44:57.942Z"
+        },
+        {
+          "id": "task-3",
+          "text": "Refactor async task sync queue & cache layer",
+          "category": "Engineering",
+          "completed": false,
+          "recurring": false,
+          "completedAt": null
+        },
+        {
+          "id": "task-4",
+          "text": "Hydrate & 15-min physical mobility reset",
+          "category": "Health",
+          "completed": false,
+          "recurring": true,
+          "completedAt": null
+        },
+        {
+          "id": "task-5",
+          "text": "Ship daily progress commit & update roadmap",
+          "category": "Deep Work",
+          "completed": false,
+          "recurring": true,
+          "completedAt": null
+        }
+      ]
+    }
+  }
+}

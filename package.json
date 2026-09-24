@@ -1,0 +1,23 @@
+{
+  "name": "ai-cockpit",
+  "version": "1.0.0",
+  "description": "AI-Driven Productivity Cockpit (Dual Widget System for Wallpaper, Desktop, and Mobile)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "keywords": [
+    "productivity",
+    "widget",
+    "wallpaper-engine",
+    "pwa",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "MIT"
+}

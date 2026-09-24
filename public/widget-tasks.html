@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0f18">
+  <title>Daily Focus Widget | AI Cockpit</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    html, body {
+      background: transparent !important;
+      margin: 0;
+      padding: 4px;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+    .mobile-widget-card {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      background: rgba(10, 15, 24, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .widget-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <!-- Confetti canvas for mobile victory -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="mobile-widget-card">
+    <div class="widget-header-row">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span style="color:var(--accent-color); font-size:0.9rem;">◈</span>
+        <span style="font-family:var(--font-heading); font-size:0.88rem; font-weight:700;">DAILY FOCUS</span>
+      </div>
+      <div class="streak-pill-mini">
+        <span class="streak-fire-mini">🔥</span>
+        <span class="streak-num-mini" id="streak-counter">0</span>
+        <span style="font-size:0.62rem; color:var(--text-secondary); text-transform:uppercase;">Days</span>
+      </div>
+    </div>
+
+    <!-- Mini Progress -->
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:0.7rem; color:var(--text-muted); font-family:var(--font-mono);" id="tasks-count">0/0 Done</span>
+      <span style="font-family:var(--font-mono); font-size:0.95rem; font-weight:800; color:var(--accent-color);" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar-fill"></div>
+    </div>
+
+    <!-- Task List (Top Missions) -->
+    <div class="sidebar-task-list" id="sidebar-task-list" style="max-height: 220px;">
+      <!-- Populated via script -->
+    </div>
+
+    <!-- Quick Add Input -->
+    <form id="mobile-add-form" style="display:flex; gap:6px; background:rgba(0,0,0,0.3); border:1px solid var(--border-glass); border-radius:6px; padding:4px 6px;">
+      <input type="text" id="mobile-task-text" placeholder="+ Add focus mission..." style="flex:1; background:transparent; border:none; outline:none; font-size:0.78rem; color:var(--text-primary);" required autocomplete="off">
+      <button type="submit" class="task-quick-btn" style="padding:4px 8px; font-size:0.72rem;">Add</button>
+    </form>
+
+    <!-- Footer Status -->
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.65rem; color:var(--text-muted); font-family:var(--font-mono); border-top:1px solid var(--border-glass); padding-top:8px;">
+      <span id="sync-status" style="cursor:pointer;" title="Tap to configure Gist Token on phone"><span class="sync-dot" id="sync-dot"></span> <span id="sync-label">SYNCING...</span> <span id="token-indicator">🔑</span></span>
+      <a href="index.html" style="color:var(--accent-color); text-decoration:none;">Full Cockpit →</a>
+    </div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/confetti.js"></script>
+  <script>
+    const state = {
+      tasks: [],
+      streak: 0,
+      userTasksObj: null,
+      gistId: localStorage.getItem('cockpit_gist_id') || 'e1a4965bf363a6d7528784ecdec7ed68',
+      gistToken: localStorage.getItem('cockpit_gist_token') || ''
+    };
+
+    function setStatus(dotClass, label) {
+      document.getElementById('sync-dot').className = 'sync-dot ' + dotClass;
+      document.getElementById('sync-label').textContent = label;
+    }
+
+    async function fetchGistConfigFromLocalServer() {
+      try {
+        const res = await fetch('/api/gist/status');
+        if (res.ok) {
+          const cfg = await res.json();
+          if (cfg.enabled && cfg.gistId) {
+            state.gistId = cfg.gistId;
+            localStorage.setItem('cockpit_gist_id', cfg.gistId);
+          }
+        }
+      } catch (e) {}
+    }
+
+    async function load() {
+      // 1. Try local server first (Wi-Fi)
+      try {
+        const res = await fetch('/api/tasks');
+        if (res.ok) {
+          const data = await res.json();
+          state.tasks = data.tasks || [];
+          state.streak = data.streak || 0;
+          updateUI(data.progress.completed, data.progress.total, data.progress.percent);
+          setStatus('online', 'LOCAL SYNC');
+          fetchGistConfigFromLocalServer();
+          return;
+        }
+      } catch (e) {}
+
+      // 2. If local server unavailable, fall back to GitHub Gist directly
+      if (state.gistId) {
+        try {
+          const headers = { 'Accept': 'application/vnd.github+json' };
+          if (state.gistToken) headers['Authorization'] = `Bearer ${state.gistToken}`;
+          
+          const res = await fetch(`https://api.github.com/gists/${state.gistId}`, { headers });
+          if (res.ok) {
+            const data = await res.json();
+            const tasksFile = data.files['tasks.json'];
+            if (tasksFile && tasksFile.content) {
+              const parsed = JSON.parse(tasksFile.content);
+              state.userTasksObj = parsed;
+              const u = parsed.users ? (parsed.users['default'] || Object.values(parsed.users)[0]) : null;
+              if (u) {
+                state.tasks = u.tasks || [];
+                state.streak = u.streak || 0;
+                const completed = state.tasks.filter(t => t.completed).length;
+                const total = state.tasks.length;
+                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                updateUI(completed, total, pct);
+                setStatus('online', 'GIST CLOUD');
+                return;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('Gist fetch error:', err);
+        }
+      }
+
+      setStatus('offline', 'OFFLINE');
+    }
+
+    function updateUI(completed, total, pct) {
+      document.getElementById('streak-counter').textContent = state.streak;
+      document.getElementById('tasks-count').textContent = `${completed}/${total} Done`;
+      document.getElementById('progress-pct').textContent = `${pct}%`;
+      document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById('sidebar-task-list');
+      list.innerHTML = '';
+      if (state.tasks.length === 0) {
+        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.75rem; padding:12px;">No missions logged.</div>`;
+        return;
+      }
+
+      state.tasks.slice(0, 5).forEach((task, i) => {
+        const el = document.createElement('div');
+        el.className = `task-item ${task.completed ? 'completed' : ''}`;
+        el.innerHTML = `
+          <div class="task-left">
+            <span class="seq-badge">#${i+1}</span>
+            <div class="custom-checkbox"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+            <span class="task-text">${task.text}</span>
+          </div>
+        `;
+
+        el.onclick = async () => {
+          task.completed = !task.completed;
+          if (task.completed) {
+            if (window.soundEngine) window.soundEngine.playComplete();
+            if (window.confettiEngine) window.confettiEngine.fire(0.5, 0.4, 30);
+          }
+          const completed = state.tasks.filter(t => t.completed).length;
+          const pct = Math.round((completed / state.tasks.length) * 100);
+          updateUI(completed, state.tasks.length, pct);
+
+          // Push to server or Gist
+          try {
+            await fetch('/api/tasks/toggle', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ taskId: task.id, completed: task.completed })
+            });
+          } catch (e) {
+            // Push directly to Gist if local server unreachable
+            if (state.gistId && state.gistToken && state.userTasksObj) {
+              try {
+                const payload = { files: { 'tasks.json': { content: JSON.stringify(state.userTasksObj, null, 2) } } };
+                await fetch(`https://api.github.com/gists/${state.gistId}`, {
+                  method: 'PATCH',
+                  headers: { 'Authorization': `Bearer ${state.gistToken}`, 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+                });
+              } catch (err) {}
+            }
+          }
+        };
+
+        list.appendChild(el);
+      });
+    }
+
+    document.getElementById('mobile-add-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = document.getElementById('mobile-task-text');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newTask = { id: `task-${Date.now()}`, text, category: 'Deep Work', completed: false, recurring: true };
+      state.tasks.push(newTask);
+      input.value = '';
+      const completed = state.tasks.filter(t => t.completed).length;
+      updateUI(completed, state.tasks.length, Math.round((completed / state.tasks.length) * 100));
+
+      try {
+        await fetch('/api/tasks/create', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ text: newTask.text, category: newTask.category, recurring: true })
+        });
+      } catch (e) {}
+    });
+
+    document.getElementById('sync-status').addEventListener('click', () => {
+      const current = state.gistToken || '';
+      const token = prompt('Enter your GitHub Personal Access Token (PAT) for remote mobile editing:', current);
+      if (token !== null) {
+        state.gistToken = token.trim();
+        localStorage.setItem('cockpit_gist_token', state.gistToken);
+        load();
+      }
+    });
+
+    load();
+    setInterval(load, 25000);
+  </script>
+</body>
+</html>

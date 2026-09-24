@@ -1,0 +1,95 @@
+{
+  "lastUpdated": "2026-09-23T23:05:33.701Z",
+  "feeds": [
+    {
+      "id": "feed-1790204733701",
+      "category": "Tech",
+      "title": "Quantum Advantage in Annealing Algorithms",
+      "summary": "New coherence retention methodology reduces error propagation.",
+      "source": "Physics Review",
+      "url": "https://example.com/quantum",
+      "timestamp": "Just now",
+      "featured": false
+    },
+    {
+      "id": "feed-1",
+      "category": "AI",
+      "title": "Autonomous Coding Agents Shift from Copilots to Async Teammates",
+      "summary": "DeepMind and Anthropic research shows next-gen reasoning models successfully planning and executing multi-file system refactors with auto-verification loops.",
+      "source": "AI Frontiers",
+      "url": "https://example.com/ai-agents-shift",
+      "timestamp": "2h ago",
+      "featured": true
+    },
+    {
+      "id": "feed-2",
+      "category": "Tech",
+      "title": "WebAssembly 3.0 Standard Unveiled: Native SIMD & Direct DOM Threading",
+      "summary": "W3C finalizes draft enabling near-native C++/Rust execution directly in browser background threads with zero serialization latency.",
+      "source": "W3C Tech Wire",
+      "url": "https://example.com/wasm-3-draft",
+      "timestamp": "4h ago",
+      "featured": false
+    },
+    {
+      "id": "feed-3",
+      "category": "Engineering",
+      "title": "Zero-Overhead Memory Tiering: Linux 6.18 Kernel Benchmarks",
+      "summary": "New CXL memory paging architecture reduces tiering stalls by 42% on ultra-high throughput distributed key-value storage clusters.",
+      "source": "Kernel Traffic",
+      "url": "https://example.com/linux-cxl-memory",
+      "timestamp": "6h ago",
+      "featured": false
+    },
+    {
+      "id": "feed-4",
+      "category": "Startups",
+      "title": "Bootstrapped AI Infra Studio Reaches $10M ARR with 4 Engineers",
+      "summary": "Focusing purely on sub-millisecond vector indexing caching layers, the lean team scaled to 1,200 enterprise clients without venture funding.",
+      "source": "Founder Weekly",
+      "url": "https://example.com/bootstrap-10m-arr",
+      "timestamp": "8h ago",
+      "featured": true
+    },
+    {
+      "id": "feed-5",
+      "category": "AI",
+      "title": "Small Language Models Surpass 70B Architectures on Edge Robotics",
+      "summary": "Quantized 3B parameter models running directly on mobile NPUs achieve 94% task planning accuracy in real-time manipulation benchmarks.",
+      "source": "Robotics & ML Review",
+      "url": "https://example.com/edge-slm-robotics",
+      "timestamp": "12h ago",
+      "featured": false
+    },
+    {
+      "id": "feed-6",
+      "category": "Engineering",
+      "title": "Solid-State Battery Breakthrough Yields 1,000 Wh/L Density",
+      "summary": "New silicon-composite anode eliminates dendrite formation over 2,500 rapid charge cycles at ambient room temperature.",
+      "source": "Materials Nature",
+      "url": "https://example.com/solid-state-battery",
+      "timestamp": "14h ago",
+      "featured": false
+    },
+    {
+      "id": "feed-7",
+      "category": "Startups",
+      "title": "Why the Next Wave of DevTools Prioritizes Local-First Architecture",
+      "summary": "Modern developers demand zero-latency offline performance with CRDT cloud sync over traditional request-response SaaS apps.",
+      "source": "Indie Hackers",
+      "url": "https://example.com/local-first-devtools",
+      "timestamp": "16h ago",
+      "featured": false
+    },
+    {
+      "id": "feed-8",
+      "category": "Tech",
+      "title": "RISC-V High-Performance Server Chips Enter Mass Production",
+      "summary": "128-core RISC-V compute nodes enter commercial hyperscaler datacenters, offering competitive perf-per-watt against ARM Neoverse.",
+      "source": "Silicon Digest",
+      "url": "https://example.com/riscv-server-chips",
+      "timestamp": "18h ago",
+      "featured": false
+    }
+  ]
+}

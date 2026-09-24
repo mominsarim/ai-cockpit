@@ -1,0 +1,18 @@
+{
+  "name": "AI Cockpit | Productivity HUD",
+  "short_name": "AI Cockpit",
+  "description": "Unified Dual Widget System for Wallpaper, Desktop, and Mobile. Daily Innovation Feeds & Dopamine Task Tracker.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#06090e",
+  "theme_color": "#06090e",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

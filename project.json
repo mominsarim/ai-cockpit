@@ -1,0 +1,42 @@
+{
+  "title": "AI Cockpit HUD",
+  "description": "AI-Driven Productivity Cockpit: Innovation Feed & Dopamine To-Do Dashboard",
+  "file": "public/index.html",
+  "type": "web",
+  "version": 1,
+  "general": {
+    "properties": {
+      "customAccentColor": {
+        "text": "Accent Color",
+        "type": "color",
+        "value": "0 0.94 1.0"
+      },
+      "glassOpacity": {
+        "text": "HUD Glass Opacity (%)",
+        "type": "slider",
+        "min": 20,
+        "max": 100,
+        "step": 5,
+        "value": 82
+      },
+      "blurAmount": {
+        "text": "Backdrop Blur (px)",
+        "type": "slider",
+        "min": 0,
+        "max": 30,
+        "step": 2,
+        "value": 16
+      },
+      "ghostMode": {
+        "text": "Ambient Ghost Mode (Auto Dim on Idle)",
+        "type": "bool",
+        "value": true
+      },
+      "soundEnabled": {
+        "text": "Dopamine Audio Cues",
+        "type": "bool",
+        "value": true
+      }
+    }
+  }
+}

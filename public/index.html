@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#05070a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="AI Cockpit - Live Wallpaper & Engineering Focus HUD for AI Engineers & Builders.">
+  <title>AI Cockpit | Live Wallpaper & Focus HUD</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Fixed Generative Neural Network Canvas -->
+  <canvas id="wallpaper-canvas"></canvas>
+
+  <!-- Particle Burst Layer -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Floating Zen Micro-Pill (Visible when Sidebar is Collapsed) -->
+  <div class="floating-zen-pill" id="zen-micro-pill" title="Click to open Cockpit HUD (or press Z)">
+    <span class="pill-streak" id="pill-streak">🔥 3d</span>
+    <span class="pill-task" id="pill-top-task">🎯 Deep Work: 90-min core architecture</span>
+    <span class="pill-expand-icon">⇲</span>
+  </div>
+
+  <!-- Master Wallpaper Environment -->
+  <div class="wallpaper-environment">
+    <!-- LEFT / CENTER STAGE: ZEN FOCUS & ENGINEERING BRAINSTORMER -->
+    <main class="zen-stage" id="zen-stage">
+      <!-- Top Bar -->
+      <header class="zen-top-bar">
+        <div class="zen-brand">
+          <div class="zen-logo">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="zen-title">AI COCKPIT <span style="font-size:0.65rem; color:var(--accent-color); font-family:var(--font-mono);">// FOCUS HUD</span></div>
+            <div class="zen-tagline">Engineered for Deep Work &amp; Shipped Results</div>
+          </div>
+        </div>
+
+        <div class="zen-clock-group">
+          <div class="zen-clock" id="hud-clock">00:00:00</div>
+          <div class="zen-date" id="hud-date">Loading...</div>
+        </div>
+      </header>
+
+      <!-- Center Stage: First-Principles Brainstormer -->
+      <section class="zen-center-content">
+        <span class="zen-principle-badge" id="zen-principle-badge">FIRST PRINCIPLES</span>
+        <h2 class="zen-prompt-text" id="zen-prompt-text">“Deconstruct to fundamentals: If you had to rebuild this from raw mathematics and code, what is strictly necessary?”</h2>
+        <div class="zen-author-text" id="zen-author-text">// Elon Musk's Engineering Algorithm</div>
+
+        <!-- Action Row -->
+        <div class="zen-actions-row">
+          <button class="zen-btn" id="zen-shuffle-btn" title="Cycle Engineering Mental Model">
+            <span>↻</span> Next Model
+          </button>
+          
+          <button class="zen-btn" id="open-scratchpad-btn" title="Open Architectural Scratchpad">
+            <span>📝</span> Scratchpad
+          </button>
+
+          <!-- Pomodoro / Deep Work Flow Timer -->
+          <div class="flow-timer-widget">
+            <span class="flow-timer-display" id="flow-timer-display">25:00</span>
+            <button class="zen-btn" id="flow-timer-toggle" style="padding: 4px 10px; font-size: 0.72rem;">▶ Flow</button>
+            <select class="flow-timer-mode" id="flow-timer-mode" title="Session Length">
+              <option value="25">25m</option>
+              <option value="50">50m</option>
+              <option value="90">90m</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Bar: Introverted Craftsmanship Mantra -->
+      <footer class="zen-bottom-bar">
+        <div class="zen-mantra">
+          <span>⚡</span>
+          <span>Execute quietly in monk mode. <span class="zen-mantra-highlight">Let the shipped product speak for itself.</span></span>
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">
+          Press <kbd style="background:rgba(255,255,255,0.08); padding:2px 6px; border-radius:4px; color:var(--text-secondary);">Z</kbd> for Pure Wallpaper
+        </div>
+      </footer>
+    </main>
+
+    <!-- RIGHT DOCK: SLEEK COLLAPSIBLE HUD SIDEBAR (380px) -->
+    <aside class="cockpit-sidebar-hud" id="cockpit-sidebar-hud">
+      <!-- Sidebar Header -->
+      <div class="sidebar-header">
+        <div class="sidebar-title-group">
+          <span style="color:var(--accent-color); font-size:0.85rem;">◈</span>
+          <h3 class="sidebar-title">COCKPIT HUD</h3>
+        </div>
+        <div class="sidebar-controls">
+          <button class="hud-icon-btn" id="sound-btn" title="Toggle Audio Chimes">
+            <span id="sound-icon">🔊</span>
+          </button>
+          <button class="hud-icon-btn" id="tuning-btn" title="Wallpaper Tuning &amp; Background">
+            <span>⚙️</span>
+          </button>
+          <button class="hud-icon-btn" id="collapse-sidebar-btn" title="Collapse into Zen Pill (Press Z)">
+            <span>⇥</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Velocity & Streak Hero Banner -->
+      <div class="sidebar-velocity-card">
+        <div class="velocity-stats-row">
+          <div class="streak-pill-mini" title="Daily Completion Streak">
+            <span class="streak-fire-mini">🔥</span>
+            <span class="streak-num-mini" id="streak-counter">3</span>
+            <span style="font-size:0.65rem; color:var(--text-secondary); text-transform:uppercase;">Days</span>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:6px;">
+            <span style="font-size:0.65rem; color:var(--text-muted); font-family:var(--font-mono);" id="tasks-count">2/5 Done</span>
+            <span class="velocity-pct-mini" id="progress-pct">40%</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar-fill"></div>
+        </div>
+
+        <div class="dopamine-quote-mini" id="dopamine-quote">
+          “Momentum initiated. Keep the flow state alive!”
+        </div>
+      </div>
+
+      <!-- MODULE: DAILY SEQUENCER // TOP MISSIONS -->
+      <div class="sidebar-section">
+        <div class="section-label-row">
+          <span class="section-label">
+            <span>🎯</span> DAILY SEQUENCE
+          </span>
+          <span class="section-sub">Top Focus</span>
+        </div>
+
+        <!-- Task Checklist Container -->
+        <div class="sidebar-task-list" id="sidebar-task-list">
+          <!-- Dynamically populated with sequence numbers #1, #2, #3 -->
+        </div>
+
+        <!-- Quick Add Form -->
+        <form class="task-quick-input" id="new-task-form">
+          <input type="text" id="new-task-text" placeholder="+ Add focus mission..." required autocomplete="off">
+          <select id="new-task-category" style="background:transparent; border:none; color:var(--text-secondary); font-size:0.7rem; outline:none;">
+            <option value="Deep Work">Deep Work</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Learning">Learning</option>
+            <option value="Health">Health</option>
+          </select>
+          <button type="submit" class="task-quick-btn">Add</button>
+        </form>
+      </div>
+
+      <!-- MODULE: INNOVATION FEED // GLANCEABLE TICKER -->
+      <div class="sidebar-section sidebar-feed-section">
+        <div class="section-label-row">
+          <span class="section-label">
+            <span>⚡</span> INNOVATION STREAM
+          </span>
+          <span style="cursor:pointer; font-size:0.68rem; color:var(--accent-color);" id="add-feed-trigger">+ Note</span>
+        </div>
+
+        <!-- Mini Category Filters -->
+        <div class="feed-mini-filters" id="feed-mini-filters">
+          <button class="feed-mini-pill active" data-category="All">All</button>
+          <button class="feed-mini-pill" data-category="AI">#AI</button>
+          <button class="feed-mini-pill" data-category="Tech">#Tech</button>
+          <button class="feed-mini-pill" data-category="Startups">#Startups</button>
+        </div>
+
+        <!-- Compact Spotlight Card -->
+        <div class="spotlight-mini-card" id="spotlight-mini-card">
+          <div class="spotlight-mini-tag" id="spotlight-mini-tag">#AI • SPOTLIGHT</div>
+          <div class="spotlight-mini-title" id="spotlight-mini-title">Autonomous Coding Agents Shift to Async Teammates</div>
+          <div class="spotlight-mini-meta">
+            <span id="spotlight-mini-source">AI Frontiers</span>
+            <span style="color:var(--accent-color);" id="spotlight-open-link">Read →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="sync-status-badge" id="sync-status">
+          <span class="sync-dot" id="sync-dot"></span>
+          <span id="sync-label">ONLINE</span>
+        </div>
+        <div style="font-size:0.68rem; color:var(--text-muted); font-family:var(--font-mono);">
+          <span id="mobile-lan-hint">LAN: 192.168.1.4:3000</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ARCHITECTURAL SCRATCHPAD MODAL -->
+  <div class="tuning-modal-backdrop" id="scratchpad-modal">
+    <div class="tuning-modal" style="max-width: 600px;">
+      <div class="tuning-modal-header">
+        <h3 style="font-size: 1rem; color: var(--text-primary);">📝 Architectural Scratchpad</h3>
+        <button class="hud-icon-btn" id="close-scratchpad-btn">&times;</button>
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-secondary);">Dump code ideas, system architecture, or first-principles decompositions. Auto-saves locally.</p>
+      <textarea id="brainstorm-scratchpad" rows="10" placeholder="// Jot down technical notes, API designs, or sequence thoughts..." style="background: rgba(0,0,0,0.45); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.8rem; outline: none; resize: vertical; line-height: 1.5;"></textarea>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="zen-btn" id="save-scratchpad-btn">Close &amp; Keep In Mind</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLPAPER TUNING MODAL -->
+  <div class="tuning-modal-backdrop" id="tuning-modal">
+    <div class="tuning-modal">
+      <div class="tuning-modal-header">
+        <h3 style="font-size: 1rem; color: var(--text-primary);">⚙️ Wallpaper &amp; Cockpit Tuning</h3>
+        <button class="hud-icon-btn" id="close-tuning-btn">&times;</button>
+      </div>
+
+      <!-- Background Mode -->
+      <div class="tuning-field">
+        <label class="tuning-label">Wallpaper Style</label>
+        <div style="display:flex; gap:8px;">
+          <button class="zen-btn" id="bg-mode-neural" style="flex:1; justify-content:center;">Neural Lattice</button>
+          <button class="zen-btn" id="bg-mode-obsidian" style="flex:1; justify-content:center;">Deep Obsidian</button>
+          <button class="zen-btn" id="bg-mode-custom" style="flex:1; justify-content:center;">Custom Image</button>
+        </div>
+        <input type="url" id="custom-bg-input" placeholder="Custom image URL (https://...)" style="display:none; background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:6px; padding:6px 10px; color:var(--text-primary); font-size:0.75rem; margin-top:6px;">
+      </div>
+
+      <!-- Color Theme -->
+      <div class="tuning-field">
+        <label class="tuning-label">Cyber Accent Color</label>
+        <div class="theme-swatches">
+          <div class="theme-swatch cyan active" data-set-theme="cyan" title="Cyber Cyan"></div>
+          <div class="theme-swatch emerald" data-set-theme="emerald" title="Matrix Emerald"></div>
+          <div class="theme-swatch amber" data-set-theme="amber" title="Solar Amber"></div>
+          <div class="theme-swatch purple" data-set-theme="purple" title="Midnight Violet"></div>
+        </div>
+      </div>
+
+      <!-- HUD Opacity -->
+      <div class="tuning-field">
+        <div style="display:flex; justify-content:space-between;">
+          <label class="tuning-label">HUD Glass Opacity</label>
+          <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--accent-color);" id="opacity-val">78%</span>
+        </div>
+        <input type="range" min="0.2" max="1.0" step="0.05" value="0.78" class="settings-slider" id="opacity-slider" style="accent-color:var(--accent-color);">
+      </div>
+
+      <!-- Mobile Wi-Fi Sync -->
+      <div class="tuning-field">
+        <label class="tuning-label">📱 Mobile Sync (Local Wi-Fi)</label>
+        <div style="background:rgba(0,0,0,0.35); padding:8px 12px; border-radius:6px; font-size:0.72rem; color:var(--text-secondary); line-height:1.4;">
+          Open on your phone (same Wi-Fi) to sync tasks &amp; install to home screen:
+          <div style="font-family:var(--font-mono); color:var(--accent-color); margin-top:4px;" id="mobile-lan-url">Detecting...</div>
+        </div>
+      </div>
+
+      <!-- GitHub Gist Cloud Sync (Serverless) -->
+      <div class="tuning-field" style="border-top:1px solid var(--border-glass); padding-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label class="tuning-label">☁️ GitHub Gist Cloud Sync</label>
+          <span style="font-size:0.65rem; color:var(--accent-color); font-family:var(--font-mono);" id="gist-status-pill">Offline / Local</span>
+        </div>
+        <p style="font-size:0.7rem; color:var(--text-muted); line-height:1.35; margin-bottom:4px;">
+          Zero-cost serverless database. Syncs tasks &amp; feeds globally without a VPS.
+        </p>
+        <input type="password" id="gist-token-input" placeholder="GitHub Personal Access Token (ghp_...)" style="background:rgba(0,0,0,0.45); border:1px solid var(--border-glass); border-radius:6px; padding:6px 10px; color:var(--text-primary); font-size:0.75rem; font-family:var(--font-mono);">
+        <input type="text" id="gist-id-input" placeholder="Existing Gist ID (leave blank to auto-create)" style="background:rgba(0,0,0,0.45); border:1px solid var(--border-glass); border-radius:6px; padding:6px 10px; color:var(--text-primary); font-size:0.75rem; font-family:var(--font-mono); margin-top:4px;">
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <button class="task-quick-btn" id="link-gist-btn" style="flex:1; padding:6px; font-size:0.75rem;">Link &amp; Sync Gist</button>
+          <button class="zen-btn" id="pull-gist-btn" style="padding:6px 12px; font-size:0.75rem;">↻ Pull</button>
+        </div>
+        <div id="gist-active-meta" style="display:none; font-size:0.68rem; font-family:var(--font-mono); color:var(--success-color); margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD INNOVATION HEADLINE MODAL -->
+  <div class="tuning-modal-backdrop" id="add-feed-modal">
+    <div class="tuning-modal">
+      <div class="tuning-modal-header">
+        <h3 style="font-size: 1rem; color: var(--text-primary);">+ Log Tech Innovation / Note</h3>
+        <button class="hud-icon-btn" id="close-feed-modal-btn">&times;</button>
+      </div>
+      <form id="create-feed-form" style="display:flex; flex-direction:column; gap:10px;">
+        <input type="text" id="feed-input-title" placeholder="Breakthrough or Insight Title" style="background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:6px; padding:8px; color:var(--text-primary); font-size:0.8rem;" required>
+        <textarea id="feed-input-summary" placeholder="Deconstruction or practical engineering value..." rows="3" style="background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:6px; padding:8px; color:var(--text-primary); font-size:0.8rem; resize:none;" required></textarea>
+        <div style="display:flex; gap:8px;">
+          <select id="feed-input-category" style="background:rgba(18,26,42,0.8); border:1px solid var(--border-glass); border-radius:6px; padding:6px; color:var(--text-secondary); font-size:0.75rem; flex:1;">
+            <option value="AI">AI</option>
+            <option value="Tech">Tech</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Startups">Startups</option>
+          </select>
+          <input type="text" id="feed-input-source" placeholder="Source (e.g. arXiv)" style="background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:6px; padding:6px; color:var(--text-primary); font-size:0.75rem; flex:1;">
+        </div>
+        <input type="url" id="feed-input-url" placeholder="Source URL (https://...)" style="background:rgba(0,0,0,0.4); border:1px solid var(--border-glass); border-radius:6px; padding:6px; color:var(--text-primary); font-size:0.75rem;">
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:6px;">
+          <button type="button" class="zen-btn" id="cancel-feed-modal-btn">Cancel</button>
+          <button type="submit" class="task-quick-btn" style="padding:6px 14px; font-size:0.78rem;">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/wallpaper-canvas.js"></script>
+  <script src="js/brainstorm.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
