@@ -261,7 +261,9 @@
     });
 
     load();
-    setInterval(load, 25000);
+    setInterval(load, 10000);
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
   </script>
 </body>
 </html>

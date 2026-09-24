@@ -710,10 +710,15 @@
     loadTasks();
     loadFeeds().then(() => startSpotlightCycle());
     checkLAN();
-    checkGistStatus();
+    // Auto-refresh tasks every 10 seconds so changes from mobile appear automatically
+    setInterval(loadTasks, 10000);
+    setInterval(loadFeeds, 300000);
 
-    setInterval(loadTasks, 60000);
-    setInterval(loadFeeds, 600000);
+    // Instant refresh when returning to window or unlocking laptop
+    window.addEventListener('focus', () => loadTasks());
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) loadTasks();
+    });
   }
 
   if (document.readyState === 'loading') {

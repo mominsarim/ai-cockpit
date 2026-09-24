@@ -411,6 +411,13 @@ app.listen(PORT, '0.0.0.0', () => {
     if (r.success) console.log('☁️ Synced state from GitHub Gist on startup.');
   }).catch(() => {});
 
+  // Continuous automatic background sync from GitHub Gist every 20 seconds
+  setInterval(async () => {
+    if (gistSync.config && gistSync.config.enabled) {
+      await gistSync.pullFromGist().catch(() => {});
+    }
+  }, 20000);
+
   console.log(`\n==================================================`);
   console.log(`🚀 AI Cockpit server running at http://localhost:${PORT}`);
   console.log(`📱 Mobile/LAN URL:`);
